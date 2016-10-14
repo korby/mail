@@ -124,10 +124,10 @@ $mail->AddAddress($desti);
 if($attachs) {
 	if(is_array($attachs)) {
 		foreach ($attachs as $attach) {
-			$mail->AddAttachment($attach);
+			$mail->AddAttachment(realpath($attachs));
 		}
 	} else {
-		$mail->AddAttachment($attachs);
+		$mail->AddAttachment(realpath($attachs));
 	}
 }
 
