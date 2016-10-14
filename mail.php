@@ -1,13 +1,11 @@
 #!/usr/bin/env php
 <?php
 
-if (in_array('phar', stream_get_wrappers()) && class_exists('Phar', 0)) {
-	$includePrefix = "phar://mail.phar/";
-} else {
-	$includePrefix = "./";
-}
-require($includePrefix.'class.phpmailer.php');
-require($includePrefix.'class.smtp.php');
+	$includePrefix = __DIR__."/";
+
+
+require $includePrefix.'class.phpmailer.php';
+require $includePrefix.'class.smtp.php';
 
 $from=get_current_user()."@".gethostname();
 $body= "See attachment(s).";
