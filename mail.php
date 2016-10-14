@@ -6,8 +6,8 @@ if (in_array('phar', stream_get_wrappers()) && class_exists('Phar', 0)) {
 } else {
 	$includePrefix = "./";
 }
-require_once($includePrefix.'class.phpmailer.php');
-require_once($includePrefix.'class.smtp.php');
+require($includePrefix.'class.phpmailer.php');
+require($includePrefix.'class.smtp.php');
 
 $from=get_current_user()."@".gethostname();
 $body= "See attachment(s).";
