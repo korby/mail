@@ -1,0 +1,81 @@
+#!/usr/bin/env php
+<?php
+
+
+
+$compiler = new Compiler();
+$compiler->compile();
+
+
+/**
+ * The Compiler class compiles the Mail utility.
+ * Heavily based on Goutte compiler
+ * @author André Cianfarani <acianfa@gmail.com>
+ */
+class Compiler
+{
+    public function compile($pharFile = 'mail.phar')
+    {
+        if (file_exists($pharFile)) {
+            unlink($pharFile);
+        }
+        $shebang = "#!/usr/bin/env php\n";
+        file_put_contents("mail.php", str_replace($shebang, "", file_get_contents("mail.php")));
+        $phar = new \Phar($pharFile, 0, 'Mail');
+        $phar->convertToExecutable(Phar::PHAR);
+        $phar->setSignatureAlgorithm(\Phar::SHA1);
+
+        $phar->startBuffering();
+
+        // CLI Component files
+        foreach ($this->getFiles() as $file) {
+            $path = str_replace(__DIR__.'/', '', $file);
+            $phar->addFromString($path, file_get_contents($file));
+        }
+
+        $phar->setStub($shebang . $phar->createDefaultStub('mail.php'));
+
+        $phar->stopBuffering();
+        file_put_contents("mail.php", $shebang.file_get_contents("mail.php"));
+        chmod("./mail.phar", 0750);
+        unset($phar);
+    }
+
+    
+
+    protected function getLicense()
+    {
+        return '
+    /*
+     * Copyright (c) 2015 André Cianfarani
+    * Permission is hereby granted, free of charge, to any person obtaining a copy
+    * of this software and associated documentation files (the "Software"), to deal
+    * in the Software without restriction, including without limitation the rights
+    * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    * copies of the Software, and to permit persons to whom the Software is furnished
+    * to do so, subject to the following conditions:
+    *
+    * The above copyright notice and this permission notice shall be included in all
+    * copies or substantial portions of the Software.
+    *
+    * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    * THE SOFTWARE.
+     */';
+    }
+
+    protected function getFiles()
+    {
+        $files = array(
+            'mail.php',
+            'class.phpmailer.php',
+            'class.smtp.php'
+        );
+
+        return $files;
+    }
+}
